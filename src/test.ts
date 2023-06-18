@@ -1,6 +1,6 @@
 import { WebAssemblyGenerator } from "./generator";
 
-const gen = new WebAssemblyGenerator("script");
+const gen = new WebAssemblyGenerator("out/script");
 
 gen.module(() => {
     gen.memory();

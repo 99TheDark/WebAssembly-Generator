@@ -4,12 +4,12 @@ import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyType, w } f
 
 // TODO: Make all functions closures
 export class WebAssemblyGenerator {
-    private name: string;
+    private location: string;
     private indention: number;
     private code: string;
 
-    constructor(name: string) {
-        this.name = name;
+    constructor(location: string) {
+        this.location = location;
         this.indention = 0;
         this.code = "";
     }
@@ -496,10 +496,10 @@ export class WebAssemblyGenerator {
     async compile(): Promise<void> {
         return new Promise(
             (resolve, reject) => {
-                fs.writeFile(`out/${this.name}.wat`, this.code, err => {
+                fs.writeFile(`${this.location}.wat`, this.code, err => {
                     if(err) reject(err);
 
-                    exec(`wat2wasm out/${this.name}.wat -o out/${this.name}.wasm`, (err, _, stderr) => {
+                    exec(`wat2wasm ${this.location}.wat -o ${this.location}.wasm`, (err, _, stderr) => {
                         if(err) reject(err);
                         if(stderr) reject(stderr);
 
@@ -511,7 +511,7 @@ export class WebAssemblyGenerator {
     }
 
     run(): void {
-        fs.readFile(`out/${this.name}.wasm`, async (err, buffer) => {
+        fs.readFile(`${this.location}.wasm`, async (err, buffer) => {
             if(err) throw err;
 
             const module = await WebAssembly.instantiate(buffer);
