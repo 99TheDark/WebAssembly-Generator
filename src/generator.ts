@@ -3,6 +3,7 @@ import { exec } from "child_process";
 import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyType, w } from "./types";
 
 // TODO: Make all functions closures
+// TODO: Add imports
 export class WebAssemblyGenerator {
     private location: string;
     private indention: number;
@@ -28,13 +29,6 @@ export class WebAssemblyGenerator {
         } else {
             this.append(`(${params.join(" ")})`);
         }
-    }
-
-    private closureify(body: Function): Function {
-        return () => this.closure(
-            [],
-            [body]
-        );
     }
 
     // Main
