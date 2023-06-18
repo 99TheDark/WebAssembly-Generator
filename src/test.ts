@@ -1,7 +1,6 @@
-import { run } from "./runner";
 import { WebAssemblyGenerator } from "./generator";
 
-const gen = new WebAssemblyGenerator();
+const gen = new WebAssemblyGenerator("script");
 
 gen.module(() => {
     gen.memory();
@@ -66,4 +65,5 @@ gen.module(() => {
     gen.start("main");
 });
 
-run(gen.stringify());
+gen.compile()
+    .then(() => gen.run())

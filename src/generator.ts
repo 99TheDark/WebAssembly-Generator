@@ -1,11 +1,15 @@
+import fs from "fs";
+import { exec } from "child_process";
 import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyType, w } from "./types";
 
 // TODO: Make all functions closures
 export class WebAssemblyGenerator {
+    private name: string;
     private indention: number;
     private code: string;
 
-    constructor() {
+    constructor(name: string) {
+        this.name = name;
         this.indention = 0;
         this.code = "";
     }
@@ -487,5 +491,34 @@ export class WebAssemblyGenerator {
     // Output
     stringify(): string {
         return this.code;
+    }
+
+    async compile(): Promise<void> {
+        return new Promise(
+            (resolve, reject) => {
+                fs.writeFile("out/script.wat", this.code, err => {
+                    if(err) reject(err);
+
+                    exec("wat2wasm out/script.wat -o out/script.wasm", (err, _, stderr) => {
+                        if(err) reject(err);
+                        if(stderr) reject(stderr);
+
+                        resolve();
+                    });
+                });
+            }
+        );
+    }
+
+    run(): void {
+        fs.readFile("out/script.wasm", async (err, buffer) => {
+            if(err) throw err;
+
+            const module = await WebAssembly.instantiate(buffer);
+
+            const exports = module.instance.exports;
+
+            // console.log((exports.main as Function)());
+        });
     }
 }
