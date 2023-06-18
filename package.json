@@ -4,7 +4,7 @@
   },
   "name": "webassembly-generator",
   "description": "Generate and run WebAssembly code easily with TypeScript!",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "generator.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
