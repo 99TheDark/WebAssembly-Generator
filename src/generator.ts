@@ -1,9 +1,10 @@
 import fs from "fs";
 import { exec } from "child_process";
-import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyType, w } from "./types";
+import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyReferenceType, WebAssemblyType, w } from "./types";
 
 function escapify(ch: string): string {
-    return `\\${ch.charCodeAt(0).toString(16).padStart(2, "0")}`;
+    let full = ch.charCodeAt(0).toString(16).padStart(4, "0");
+    return (full.match(/.{1,2}/g) ?? []).map(strItem => `\\${strItem}`).join("");
 };
 
 // TODO: Make all functions closures
@@ -12,6 +13,7 @@ export class WebAssemblyGenerator {
     private imports: WebAssembly.Imports;
     private indention: number;
     private allocation: number;
+    private mem: WebAssembly.Memory;
     private code: string;
 
     constructor(location: string, imports: WebAssembly.Imports) {
@@ -19,6 +21,7 @@ export class WebAssemblyGenerator {
         this.imports = imports;
         this.indention = 0;
         this.allocation = 0;
+        this.mem = new WebAssembly.Memory({ initial: 0 });
         this.code = "";
     }
 
@@ -46,11 +49,10 @@ export class WebAssemblyGenerator {
         );
     }
 
-    import(location: string[], name: string, params: WebAssemblyType[]): void {
-        const stringified = location.map(loc => `"${loc}"`);
+    import(library: string, funcName: string, name: string, params: WebAssemblyType[]): void {
         const paramString = params.map(param => w[param]).join(" ");
         this.closure(
-            ["import", ...stringified, `(func $${name} (param ${paramString}))`]
+            ["import", `"${library}"`, `"${funcName}"`, `(func $${name} (param ${paramString}))`]
         );
     }
 
@@ -78,6 +80,19 @@ export class WebAssemblyGenerator {
         this.closure(
             [`call $${name}`],
             params
+        );
+    }
+
+    table(name: string, size: number, elements: WebAssemblyReferenceType): void {
+        this.closure(
+            ["table", `$${name}`, `${size}`, elements]
+        );
+    }
+
+    elements(alignment: Function, references: string[]): void {
+        this.closure(
+            ["elem"],
+            [alignment, ...references.map(ref => () => this.append(`$${ref}`))]
         );
     }
 
@@ -250,7 +265,14 @@ export class WebAssemblyGenerator {
 
     rightShift(type: WebAssemblyIntegerType, left: Function, right: Function): void {
         this.closure(
-            [`${w[type]}.shr`],
+            [`${w[type]}.shr_s`],
+            [left, right]
+        )
+    }
+
+    rightUnsignedShift(type: WebAssemblyIntegerType, left: Function, right: Function): void {
+        this.closure(
+            [`${w[type]}.shr_u`],
             [left, right]
         )
     }
@@ -443,21 +465,29 @@ export class WebAssemblyGenerator {
     }
 
     // Memory
-    memory(): void {
+    allocate(body: Function, size: number | void, pages: number | void): void {
+        body();
         this.closure(
             ["memory", "$memory", this.allocation.toString()]
         );
         this.closure(
             ["export", `"memory"`, `(memory $memory)`]
         );
+        this.mem.grow(this.allocation);
     }
 
-    store(type: WebAssemblyType): void {
-        this.append(`${w[type]}.store`);
+    store(type: WebAssemblyType, offset: number, alignment: Function, value: Function): void {
+        this.closure(
+            [`${w[type]}.store`],
+            [() => this.append(`offset=${offset}`), alignment, value]
+        );
     }
 
-    load(type: WebAssemblyType): void {
-        this.append(`${w[type]}.load`);
+    load(type: WebAssemblyType, offset: number, alignment: Function): void {
+        this.closure(
+            [`${w[type]}.load`],
+            [() => this.append(`offset=${offset}`), alignment]
+        );
     }
 
     size(): void {
@@ -496,10 +526,16 @@ export class WebAssemblyGenerator {
         );
     }
 
-    loop(name: string, body: Function): void {
+    loop(name: string, condition: Function, body: Function): void {
         this.closure(
             ["loop", `$${name}`],
-            [body]
+            [
+                body,
+                () => this.closure(
+                    ["br_if", `$${name}`],
+                    [condition]
+                )
+            ]
         );
     }
 
@@ -526,10 +562,6 @@ export class WebAssemblyGenerator {
             ["select"],
             [a, b, boolean]
         );
-    }
-
-    pop(): void {
-        this.append("drop");
     }
 
     // Output
@@ -561,7 +593,6 @@ export class WebAssemblyGenerator {
             const module = await WebAssembly.instantiate(wasmBuffer, this.imports);
 
             const exports = module.instance.exports;
-            const memory = exports.memory as WebAssembly.Memory;
         });
     }
 }

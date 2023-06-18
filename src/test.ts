@@ -2,17 +2,21 @@ import { WebAssemblyGenerator } from "./generator";
 
 const gen = new WebAssemblyGenerator("out/script", {
     std: {
-        println: function() {
-
+        println: function(value: number) {
+            console.log(value);
         }
     }
 });
 
 gen.module(() => {
-    gen.import(["std", "println"], "println", ["float"]);
-    gen.string("Hello world!");
-    gen.string("A WASM 'string'");
-    gen.memory();
+    gen.import("std", "println", "log_int", ["int"]);
+    gen.import("std", "println", "log_float", ["float"]);
+    gen.allocate(() => {
+        gen.string("Hello world!");
+        gen.string("A WASM 'string'");
+    });
+    gen.table("myTable", 5, "funcref");
+    gen.elements(() => gen.const("int", 1), ["something", "fib"]);
     gen.func("something", { a: "int", b: "int" }, "int", () => {
         gen.return(() => {
             gen.multiply("int",
@@ -45,9 +49,11 @@ gen.module(() => {
         )
     });
     gen.func("main", {}, null, () => {
+        // Declarations go at the top
         gen.declare("val1", "float");
         gen.declare("val2", "float");
         gen.declare("maximum", "float");
+        gen.declare("i", "int");
 
         gen.set("val1", () => {
             gen.convert("int", "float", () => {
@@ -68,7 +74,23 @@ gen.module(() => {
             )
         });
 
-        gen.call("println", () => gen.get("maximum"));
+        gen.call("log_float", () => gen.get("maximum"));
+
+        gen.set("i", () => gen.const("int", 0));
+
+        gen.loop("loop",
+            () => gen.lessThan("int",
+                () => gen.get("i"),
+                () => gen.const("int", 10)
+            ),
+            () => {
+                gen.call("log_int", () => gen.get("i"));
+                gen.set("i", () => gen.add("int",
+                    () => gen.get("i"),
+                    () => gen.const("int", 1)
+                ));
+            }
+        );
     });
     gen.start("main");
 });

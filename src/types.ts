@@ -12,6 +12,10 @@ export type WebAssemblyFloatingType =
     "float" |
     "double"
 
+export type WebAssemblyReferenceType =
+    "funcref" |
+    "externref"
+
 export const w: Record<WebAssemblyType, string> = {
     int: "i32",
     long: "i64",
