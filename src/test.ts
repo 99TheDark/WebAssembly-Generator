@@ -48,7 +48,7 @@ gen.module(() => {
         });
         gen.set("val2", () => {
             gen.convert("int", "float", () => {
-                gen.call("fib", () => gen.const("int", 5));
+                gen.call("fib", () => gen.const("int", 10));
             });
         });
 

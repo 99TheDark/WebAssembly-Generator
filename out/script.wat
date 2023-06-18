@@ -60,7 +60,7 @@
   (local.set $val2
    (f32.convert_i32_s
     (call $fib
-     (i32.const 5)
+     (i32.const 10)
     )
    )
   )
