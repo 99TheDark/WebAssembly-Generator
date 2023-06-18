@@ -1,4 +1,5 @@
 (module
+ (import "console" "log" (func $log (param f32)))
  (memory 0)
  (func $something (param $a i32) (param $b i32) (result i32)
   (return
@@ -68,6 +69,9 @@
     (local.get $val1)
     (local.get $val2)
    )
+  )
+  (call $log
+   (local.get $maximum)
   )
  )
  (export "main" (func $main))

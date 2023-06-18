@@ -1,8 +1,9 @@
 import { WebAssemblyGenerator } from "./generator";
 
-const gen = new WebAssemblyGenerator("out/script");
+const gen = new WebAssemblyGenerator("out/script", { console: { log: console.log } });
 
 gen.module(() => {
+    gen.import(["console", "log"], "log", ["float"]);
     gen.memory();
     gen.func("something", { a: "int", b: "int" }, "int", () => {
         gen.return(() => {
@@ -59,8 +60,7 @@ gen.module(() => {
             )
         });
 
-        // instead should print to console using import
-        // gen.return(() => gen.get("maximum"));
+        gen.call("log", () => gen.get("maximum"));
     });
     gen.start("main");
 });

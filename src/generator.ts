@@ -6,11 +6,13 @@ import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyType, w } f
 // TODO: Add imports
 export class WebAssemblyGenerator {
     private location: string;
+    private imports: WebAssembly.Imports;
     private indention: number;
     private code: string;
 
-    constructor(location: string) {
+    constructor(location: string, imports: WebAssembly.Imports) {
         this.location = location;
+        this.imports = imports;
         this.indention = 0;
         this.code = "";
     }
@@ -36,6 +38,14 @@ export class WebAssemblyGenerator {
         this.closure(
             ["module"],
             [body]
+        );
+    }
+
+    import(location: string[], name: string, params: WebAssemblyType[]): void {
+        const stringified = location.map(loc => `"${loc}"`);
+        const paramString = params.map(param => w[param]).join(" ");
+        this.closure(
+            ["import", ...stringified, `(func $${name} (param ${paramString}))`]
         );
     }
 
@@ -532,7 +542,7 @@ export class WebAssemblyGenerator {
         fs.readFile(`${this.location}.wasm`, async (err, buffer) => {
             if(err) throw err;
 
-            const module = await WebAssembly.instantiate(buffer);
+            const module = await WebAssembly.instantiate(buffer, this.imports);
 
             const exports = module.instance.exports;
 
