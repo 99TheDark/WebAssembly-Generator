@@ -190,57 +190,81 @@ export class WebAssemblyGenerator {
         );
     }
 
-    not(type: WebAssemblyType): void {
-        this.append(`${w[type]}.eqz`);
+    not(type: WebAssemblyIntegerType, value: Function): void {
+        this.closure(
+            [`${w[type]}.eqz`],
+            [value]
+        );
     }
 
-    and(type: WebAssemblyType, left: Function, right: Function): void {
+    and(type: WebAssemblyIntegerType, left: Function, right: Function): void {
         this.closure(
             [`${w[type]}.and`],
             [left, right]
         )
     }
 
-    or(type: WebAssemblyType, left: Function, right: Function): void {
+    or(type: WebAssemblyIntegerType, left: Function, right: Function): void {
         this.closure(
             [`${w[type]}.or`],
             [left, right]
         )
     }
 
-    xor(type: WebAssemblyType, left: Function, right: Function): void {
+    xor(type: WebAssemblyIntegerType, left: Function, right: Function): void {
         this.closure(
             [`${w[type]}.xor`],
             [left, right]
         )
     }
 
-    leftShift(type: WebAssemblyType): void {
-        this.append(`${w[type]}.shl`);
+    leftShift(type: WebAssemblyIntegerType, left: Function, right: Function): void {
+        this.closure(
+            [`${w[type]}.shl`],
+            [left, right]
+        )
     }
 
-    rightShift(type: WebAssemblyType): void {
-        this.append(`${w[type]}.shr`);
+    rightShift(type: WebAssemblyIntegerType, left: Function, right: Function): void {
+        this.closure(
+            [`${w[type]}.shr`],
+            [left, right]
+        )
     }
 
-    leftRotate(type: WebAssemblyIntegerType): void {
-        this.append(`${w[type]}.rotl`);
+    leftRotate(type: WebAssemblyIntegerType, left: Function, right: Function): void {
+        this.closure(
+            [`${w[type]}.rotl`],
+            [left, right]
+        )
     }
 
-    rightRotate(type: WebAssemblyIntegerType): void {
-        this.append(`${w[type]}.rotr`);
+    rightRotate(type: WebAssemblyIntegerType, left: Function, right: Function): void {
+        this.closure(
+            [`${w[type]}.rotr`],
+            [left, right]
+        )
     }
 
-    countLeadingZeros(type: WebAssemblyIntegerType): void {
-        this.append(`${w[type]}.clz`);
+    countLeadingZeros(type: WebAssemblyIntegerType, value: Function): void {
+        this.closure(
+            [`${w[type]}.clz`],
+            [value]
+        );
     }
 
-    countTrailingZeros(type: WebAssemblyIntegerType): void {
-        this.append(`${w[type]}.ctz`);
+    countTrailingZeros(type: WebAssemblyIntegerType, value: Function): void {
+        this.closure(
+            [`${w[type]}.clz`],
+            [value]
+        );
     }
 
-    countOnes(type: WebAssemblyIntegerType): void {
-        this.append(`${w[type]}.popcnt`);
+    countOnes(type: WebAssemblyIntegerType, value: Function): void {
+        this.closure(
+            [`${w[type]}.popcnt`],
+            [value]
+        );
     }
 
     min(type: WebAssemblyFloatingType, a: Function, b: Function): void {
