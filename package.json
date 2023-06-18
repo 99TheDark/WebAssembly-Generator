@@ -1,29 +1,30 @@
 {
-  "devDependencies": {
-    "@types/node": "^20.3.1"
-  },
-  "name": "webassembly-generator",
-  "description": "Generate and run WebAssembly code easily with TypeScript!",
-  "version": "1.0.1",
-  "main": "generator.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/99TheDark/WebAssembly-Generator.git"
-  },
-  "keywords": [
-    "wasm",
-    "webassembly",
-    "typescript",
-    "generator",
-    "codegen"
-  ],
-  "author": "99TheDark",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/99TheDark/WebAssembly-Generator/issues"
-  },
-  "homepage": "https://github.com/99TheDark/WebAssembly-Generator#readme"
+    "devDependencies": {
+        "@types/node": "^20.3.1"
+    },
+    "name": "webassembly-generator",
+    "description": "Generate and run WebAssembly code easily with TypeScript!",
+    "version": "1.0.1",
+    "main": "index.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/99TheDark/WebAssembly-Generator.git"
+    },
+    "keywords": [
+        "wasm",
+        "wat",
+        "webassembly",
+        "typescript",
+        "generator",
+        "codegen"
+    ],
+    "author": "99TheDark",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/99TheDark/WebAssembly-Generator/issues"
+    },
+    "homepage": "https://github.com/99TheDark/WebAssembly-Generator#readme"
 }
