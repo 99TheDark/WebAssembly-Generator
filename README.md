@@ -3,5 +3,5 @@ Generate and run WebAssembly code easily with TypeScript! View on [npm](https://
 
 ### In
 ```
-npm install webassembly-generator
+npm i webassembly-generator
 ```
