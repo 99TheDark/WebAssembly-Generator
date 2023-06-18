@@ -1,4 +1,4 @@
-import { WebAssemblyGenerator } from "./generator";
+import { WebAssemblyGenerator } from "../../src";
 
 const gen = new WebAssemblyGenerator("out/script", {
     std: {
@@ -16,7 +16,7 @@ gen.module(() => {
         gen.string("A WASM 'string'");
     });
     gen.table("myTable", 5, "funcref");
-    gen.elements(() => gen.const("int", 1), ["something", "fib"]);
+    gen.elements(() => gen.const("int", 1), "something", "fib");
     gen.func("something", { a: "int", b: "int" }, "int", () => {
         gen.return(() => {
             gen.multiply("int",

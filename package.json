@@ -4,8 +4,9 @@
     },
     "name": "webassembly-generator",
     "description": "Generate and run WebAssembly code easily with TypeScript!",
-    "version": "1.0.3",
-    "main": "./src/index.ts",
+    "version": "1.2.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -15,7 +16,6 @@
     },
     "keywords": [
         "wasm",
-        "wat",
         "webassembly",
         "typescript",
         "generator",
