@@ -1,9 +1,17 @@
 import { WebAssemblyGenerator } from "./generator";
 
-const gen = new WebAssemblyGenerator("out/script", { console: { log: console.log } });
+const gen = new WebAssemblyGenerator("out/script", {
+    std: {
+        println: function() {
+
+        }
+    }
+});
 
 gen.module(() => {
-    gen.import(["console", "log"], "log", ["float"]);
+    gen.import(["std", "println"], "println", ["float"]);
+    gen.string("Hello world!");
+    gen.string("A WASM 'string'");
     gen.memory();
     gen.func("something", { a: "int", b: "int" }, "int", () => {
         gen.return(() => {
@@ -60,10 +68,9 @@ gen.module(() => {
             )
         });
 
-        gen.call("log", () => gen.get("maximum"));
+        gen.call("println", () => gen.get("maximum"));
     });
     gen.start("main");
 });
 
-gen.compile()
-    .then(() => gen.run())
+gen.compile().then(() => gen.run());

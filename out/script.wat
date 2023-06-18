@@ -1,6 +1,9 @@
 (module
- (import "console" "log" (func $log (param f32)))
- (memory 0)
+ (import "std" "println" (func $println (param f32)))
+ (data (i32.const 0) "\48\65\6c\6c\6f\20\77\6f\72\6c\64\21\00")
+ (data (i32.const 39) "\41\20\57\41\53\4d\20\27\73\74\72\69\6e\67\27\00")
+ (memory $memory 87)
+ (export "memory" (memory $memory))
  (func $something (param $a i32) (param $b i32) (result i32)
   (return
    (i32.mul
@@ -70,7 +73,7 @@
     (local.get $val2)
    )
   )
-  (call $log
+  (call $println
    (local.get $maximum)
   )
  )

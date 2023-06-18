@@ -2,18 +2,23 @@ import fs from "fs";
 import { exec } from "child_process";
 import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyType, w } from "./types";
 
+function escapify(ch: string): string {
+    return `\\${ch.charCodeAt(0).toString(16).padStart(2, "0")}`;
+};
+
 // TODO: Make all functions closures
-// TODO: Add imports
 export class WebAssemblyGenerator {
     private location: string;
     private imports: WebAssembly.Imports;
     private indention: number;
+    private allocation: number;
     private code: string;
 
     constructor(location: string, imports: WebAssembly.Imports) {
         this.location = location;
         this.imports = imports;
         this.indention = 0;
+        this.allocation = 0;
         this.code = "";
     }
 
@@ -47,6 +52,14 @@ export class WebAssemblyGenerator {
         this.closure(
             ["import", ...stringified, `(func $${name} (param ${paramString}))`]
         );
+    }
+
+    string(str: string): void {
+        const string = [...(str + "\x00")].map(ch => escapify(ch)).join("");
+        this.closure(
+            ["data", `(i32.const ${this.allocation})`, `"${string}"`]
+        );
+        this.allocation += string.length;
     }
 
     func(name: string, params: Record<string, WebAssemblyType>, result: WebAssemblyType | null, body: Function): void {
@@ -432,7 +445,10 @@ export class WebAssemblyGenerator {
     // Memory
     memory(): void {
         this.closure(
-            ["memory", "0"]
+            ["memory", "$memory", this.allocation.toString()]
+        );
+        this.closure(
+            ["export", `"memory"`, `(memory $memory)`]
         );
     }
 
@@ -539,14 +555,13 @@ export class WebAssemblyGenerator {
     }
 
     run(): void {
-        fs.readFile(`${this.location}.wasm`, async (err, buffer) => {
+        fs.readFile(`${this.location}.wasm`, async (err, wasmBuffer) => {
             if(err) throw err;
 
-            const module = await WebAssembly.instantiate(buffer, this.imports);
+            const module = await WebAssembly.instantiate(wasmBuffer, this.imports);
 
             const exports = module.instance.exports;
-
-            // console.log((exports.main as Function)());
+            const memory = exports.memory as WebAssembly.Memory;
         });
     }
 }
