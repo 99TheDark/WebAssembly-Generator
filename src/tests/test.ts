@@ -10,7 +10,9 @@ const gen = new WebAssemblyGenerator("out/script", {
 
 gen.module(() => {
     gen.import("std", "println", "log_int", ["int"]);
+    gen.import("std", "println", "log_long", ["long"]);
     gen.import("std", "println", "log_float", ["float"]);
+    gen.import("std", "println", "log_double", ["double"]);
     gen.allocate(() => {
         gen.string("Hello world!");
         gen.string("A WASM 'string'");
