@@ -16,7 +16,7 @@ function escapify(ch) {
 /**
  * Main generator function
  * @author 99TheDark <99thedark@gmail.com>
- * @version 1.3.0
+ * @version 1.3.1
  */
 class WebAssemblyGenerator {
     location;
