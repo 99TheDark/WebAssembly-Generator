@@ -18,7 +18,7 @@ gen.module(() => {
         gen.string("A WASM 'string'");
     });
     gen.table("myTable", 5, "funcref");
-    gen.elements(() => gen.const("int", 1), "something", "fib");
+    gen.elements(() => gen.const("int", 1), ["something", "fib"]);
     gen.func("something", { a: "int", b: "int" }, "int", {}, () => {
         gen.return(() => {
             gen.multiply("int",
@@ -40,12 +40,12 @@ gen.module(() => {
             }),
             () => gen.return(() => {
                 gen.add("int",
-                    () => gen.call("fib", () => {
+                    () => gen.call("fib", [() => {
                         gen.subtract("int", () => gen.get("n"), () => gen.const("int", 1));
-                    }),
-                    () => gen.call("fib", () => {
+                    }]),
+                    () => gen.call("fib", [() => {
                         gen.subtract("int", () => gen.get("n"), () => gen.const("int", 2));
-                    })
+                    }])
                 )
             })
         )
@@ -53,12 +53,12 @@ gen.module(() => {
     gen.func("main", {}, null, { val1: "float", val2: "float", maximum: "float", i: "int" }, () => {
         gen.set("val1", () => {
             gen.convert("int", "float", () => {
-                gen.call("something", () => gen.const("int", 5), () => gen.const("int", 10));
+                gen.call("something", [() => gen.const("int", 5), () => gen.const("int", 10)]);
             });
         });
         gen.set("val2", () => {
             gen.convert("int", "float", () => {
-                gen.call("fib", () => gen.const("int", 10));
+                gen.call("fib", [() => gen.const("int", 10)]);
             });
         });
 
@@ -70,7 +70,7 @@ gen.module(() => {
             )
         });
 
-        gen.call("log_float", () => gen.get("maximum"));
+        gen.call("log_float", [() => gen.get("maximum")]);
 
         gen.set("i", () => gen.const("int", 0));
 
@@ -80,7 +80,7 @@ gen.module(() => {
                 () => gen.const("int", 10)
             ),
             () => {
-                gen.call("log_int", () => gen.get("i"));
+                gen.call("log_int", [() => gen.get("i")]);
                 gen.set("i", () => gen.add("int",
                     () => gen.get("i"),
                     () => gen.const("int", 1)

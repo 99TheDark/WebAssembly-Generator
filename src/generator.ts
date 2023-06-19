@@ -62,10 +62,10 @@ export class WebAssemblyGenerator {
      * gen.module(() => {
      *     gen.import("stdlib", "println", "log", ["int", "int"]);
      *     gen.allocate(() => gen.string("Hello, world!"));
-     *     gen.func("main", {}, null, () => gen.call("log", 
+     *     gen.func("main", {}, null, () => gen.call("log", [
      *         () => gen.const("int", 0), 
      *         () => gen.const("int", 13)
-     *     ));
+     *     ]));
      *     gen.start("main");
      * });
      */
@@ -87,9 +87,9 @@ export class WebAssemblyGenerator {
      * const gen = new WebAssemblyGenerator("script", { console: { log: console.log } });
      * gen.module(() => {
      *     gen.import("console", "log", "logint", ["int"]);
-     *     gen.func("main", {}, null, () => gen.call("logint", 
+     *     gen.func("main", {}, null, () => gen.call("logint", [
      *         () => gen.const("int", -38)
-     *     ));
+     *     ]));
      * });
      */
     import(library: string, funcName: string, name: string, params: WebAssemblyType[]): void {
@@ -146,7 +146,7 @@ export class WebAssemblyGenerator {
      * @param {Function[]} params Function parameters
      * @returns {void}
      * @example
-     * gen.call("multiplyThreeNumbers", 
+     * gen.call("multiplyThreeNumbers", [
      *     () => gen.const("int", 5),
      *     () => gen.add("int",
      *         gen.const("int", 12),
@@ -156,9 +156,9 @@ export class WebAssemblyGenerator {
      *         gen.const("int", 8),
      *         gen.const("int", 10)
      *     )
-     * );
+     * ]);
      */
-    call(name: string, ...params: Function[]): void {
+    call(name: string, params: Function[]): void {
         this.closure(
             [`call $${name}`],
             params
@@ -187,9 +187,9 @@ export class WebAssemblyGenerator {
      * @returns {void}
      * @example
      * gen.table("myFunctions", 4, "funcref");
-     * gen.elements(0, "func1", "someOtherFunc");
+     * gen.elements(0, ["func1", "someOtherFunc"]);
      */
-    elements(alignment: Function, ...references: string[]): void {
+    elements(alignment: Function, references: string[]): void {
         this.closure(
             ["elem"],
             [alignment, ...references.map(ref => () => this.append(`$${ref}`))]
@@ -219,10 +219,10 @@ export class WebAssemblyGenerator {
      * @example
      * gen.add("long",
      *     gen.const("long", 1042),
-     *     gen.call("doLongOperation", 
+     *     gen.call("doLongOperation", [
      *         gen.const("long", -12),
      *         gen.get("someOtherLong")
-     *     )
+     *     ])
      * );
      */
     add(type: WebAssemblyType, left: Function, right: Function): void {
@@ -316,11 +316,11 @@ export class WebAssemblyGenerator {
      * @returns {void}
      * @example
      * gen.if(null,
-     *     gen.lessThan("int",
+     *     () => gen.lessThan("int",
      *         gen.get("x"),
      *         gen.const("int", 15)
      *     ),
-     *     gen.call("print", -1)
+     *     () => gen.call("print", [-1])
      * );
      */
     lessThan(type: WebAssemblyType, left: Function, right: Function): void {
@@ -350,11 +350,11 @@ export class WebAssemblyGenerator {
      * @returns {void}
      * @example
      * gen.if(null,
-     *     gen.greaterThan("int",
+     *     () => gen.greaterThan("int",
      *         gen.get("y"),
      *         gen.const("int", 25)
      *     ),
-     *     gen.call("print", 1)
+     *     () => gen.call("print", 1)
      * );
      */
     greaterThan(type: WebAssemblyType, left: Function, right: Function): void {
@@ -384,11 +384,11 @@ export class WebAssemblyGenerator {
      * @returns {void}
      * @example
      * gen.if(null,
-     *     gen.lessThanOrEqualTo("long",
+     *     () => gen.lessThanOrEqualTo("long",
      *         gen.get("var"),
      *         gen.const("long", -6)
      *     ),
-     *     gen.call("print", 314159)
+     *     () => gen.call("print", 314159)
      * );
      */
     lessThanOrEqualTo(type: WebAssemblyType, left: Function, right: Function): void {
@@ -418,11 +418,11 @@ export class WebAssemblyGenerator {
      * @returns {void}
      * @example
      * gen.if(null,
-     *     gen.greaterThanOrEqualTo("long",
+     *     () => gen.greaterThanOrEqualTo("long",
      *         gen.const("long", 104),
      *         gen.get("someVariable")
      *     ),
-     *     gen.call("print", 1000)
+     *     () => gen.call("print", 1000)
      * );
      */
     greaterThanOrEqualTo(type: WebAssemblyType, left: Function, right: Function): void {
