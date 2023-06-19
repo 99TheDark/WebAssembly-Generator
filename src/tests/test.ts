@@ -19,7 +19,7 @@ gen.module(() => {
     });
     gen.table("myTable", 5, "funcref");
     gen.elements(() => gen.const("int", 1), "something", "fib");
-    gen.func("something", { a: "int", b: "int" }, "int", () => {
+    gen.func("something", { a: "int", b: "int" }, "int", {}, () => {
         gen.return(() => {
             gen.multiply("int",
                 () => gen.const("int", 3),
@@ -30,7 +30,7 @@ gen.module(() => {
             );
         });
     });
-    gen.func("fib", { n: "int" }, "int", () => {
+    gen.func("fib", { n: "int" }, "int", {}, () => {
         gen.if("int",
             () => {
                 gen.lessThanOrEqualTo("int", () => gen.get("n"), () => gen.const("int", 1));
@@ -50,13 +50,7 @@ gen.module(() => {
             })
         )
     });
-    gen.func("main", {}, null, () => {
-        // Declarations go at the top
-        gen.declare("val1", "float");
-        gen.declare("val2", "float");
-        gen.declare("maximum", "float");
-        gen.declare("i", "int");
-
+    gen.func("main", {}, null, { val1: "float", val2: "float", maximum: "float", i: "int" }, () => {
         gen.set("val1", () => {
             gen.convert("int", "float", () => {
                 gen.call("something", () => gen.const("int", 5), () => gen.const("int", 10));

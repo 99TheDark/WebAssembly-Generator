@@ -1,6 +1,8 @@
 (module
  (import "std" "println" (func $log_int (param i32)))
+ (import "std" "println" (func $log_long (param i64)))
  (import "std" "println" (func $log_float (param f32)))
+ (import "std" "println" (func $log_double (param f64)))
  (data (i32.const 0) "\00\48\00\65\00\6c\00\6c\00\6f\00\20\00\77\00\6f\00\72\00\6c\00\64\00\21\00\00")
  (data (i32.const 78) "\00\41\00\20\00\57\00\41\00\53\00\4d\00\20\00\27\00\73\00\74\00\72\00\69\00\6e\00\67\00\27\00\00")
  (memory $memory 174)
@@ -55,11 +57,7 @@
   )
  )
  (export "fib" (func $fib))
- (func $main
-  (local $val1 f32)
-  (local $val2 f32)
-  (local $maximum f32)
-  (local $i i32)
+ (func $main (local $val1 f32) (local $val2 f32) (local $maximum f32) (local $i i32)
   (local.set $val1
    (f32.convert_i32_s
     (call $something

@@ -22,3 +22,9 @@ export const w: Record<WebAssemblyType, string> = {
     float: "f32",
     double: "f64"
 }
+
+export type Parameters = Record<string, WebAssemblyType>;
+
+export function parameterize(params: Parameters, sName: string): string[] {
+    return Object.entries(params).map(entry => `(${sName} $${entry[0]} ${w[entry[1]]})`);
+}
