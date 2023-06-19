@@ -465,6 +465,20 @@ export class WebAssemblyGenerator {
         );
     }
 
+    /**
+     * Bitwise AND
+     * @param {WebAssemblyIntegerType} type 
+     * @param {Function} left 
+     * @param {Function} right 
+     * @returns {void}
+     * @example
+     * gen.set("x", () => {
+     *     gen.and("int",
+     *         () => gen.const("int", 5),
+     *         () => gen.const("int", 12)
+     *     );
+     * });
+     */
     and(type: WebAssemblyIntegerType, left: Function, right: Function): void {
         this.closure(
             [`${w[type]}.and`],
