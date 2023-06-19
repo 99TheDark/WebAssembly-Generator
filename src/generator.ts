@@ -15,7 +15,6 @@ function escapify(ch: string): string {
     return (full.match(/.{1,2}/g) ?? []).map(strItem => `\\${strItem}`).join("");
 };
 
-// TODO: Make all functions closures
 /**
  * Main generator function
  * @author 99TheDark <99thedark@gmail.com>
@@ -309,6 +308,21 @@ export class WebAssemblyGenerator {
         );
     }
 
+    /**
+     * Returns a boolean 1 or 0 whether the left-hand side is less than the right-hand side
+     * @param {WebAssemblyType} type Type of numbers being compared
+     * @param {Function} left Left-hand side of the operation
+     * @param {Function} right Right-hand side of the operation
+     * @returns {void}
+     * @example
+     * gen.if(null,
+     *     gen.lessThan("int",
+     *         gen.get("x"),
+     *         gen.const("int", 15)
+     *     ),
+     *     gen.call("print", -1)
+     * );
+     */
     lessThan(type: WebAssemblyType, left: Function, right: Function): void {
         switch(type) {
             case "int":
@@ -328,6 +342,21 @@ export class WebAssemblyGenerator {
         }
     }
 
+    /**
+     * Returns a boolean 1 or 0 whether the left-hand side is greater than the right-hand side
+     * @param {WebAssemblyType} type Type of numbers being compared
+     * @param {Function} left Left-hand side of the operation
+     * @param {Function} right Right-hand side of the operation
+     * @returns {void}
+     * @example
+     * gen.if(null,
+     *     gen.greaterThan("int",
+     *         gen.get("y"),
+     *         gen.const("int", 25)
+     *     ),
+     *     gen.call("print", 1)
+     * );
+     */
     greaterThan(type: WebAssemblyType, left: Function, right: Function): void {
         switch(type) {
             case "int":
@@ -347,6 +376,21 @@ export class WebAssemblyGenerator {
         }
     }
 
+    /**
+     * Returns a boolean 1 or 0 whether the left-hand side is less than or equal to the right-hand side
+     * @param {WebAssemblyType} type Type of numbers being compared
+     * @param {Function} left Left-hand side of the operation
+     * @param {Function} right Right-hand side of the operation
+     * @returns {void}
+     * @example
+     * gen.if(null,
+     *     gen.lessThanOrEqualTo("long",
+     *         gen.get("var"),
+     *         gen.const("long", -6)
+     *     ),
+     *     gen.call("print", 314159)
+     * );
+     */
     lessThanOrEqualTo(type: WebAssemblyType, left: Function, right: Function): void {
         switch(type) {
             case "int":
@@ -366,6 +410,21 @@ export class WebAssemblyGenerator {
         }
     }
 
+    /**
+     * Returns a boolean 1 or 0 whether the left-hand side is greater than or equal to the right-hand side
+     * @param {WebAssemblyType} type Type of numbers being compared
+     * @param {Function} left Left-hand side of the operation
+     * @param {Function} right Right-hand side of the operation
+     * @returns {void}
+     * @example
+     * gen.if(null,
+     *     gen.greaterThanOrEqualTo("long",
+     *         gen.const("long", 104),
+     *         gen.get("someVariable")
+     *     ),
+     *     gen.call("print", 1000)
+     * );
+     */
     greaterThanOrEqualTo(type: WebAssemblyType, left: Function, right: Function): void {
         switch(type) {
             case "int":
@@ -591,8 +650,12 @@ export class WebAssemblyGenerator {
 
     // Variables & Constants
     /**
-     * @param type 
-     * @param value 
+     * Defines a numeric constant 
+     * @param {WebAssemblyType} type 
+     * @param {string | number} value 
+     * @returns {void}
+     * @example
+     * gen.set("x", () => gen.const("int", 99));
      */
     const(type: WebAssemblyType, value: string | number): void {
         this.closure(
@@ -600,6 +663,15 @@ export class WebAssemblyGenerator {
         );
     }
 
+    /**
+     * Declares a local variable
+     * @param {string} variable 
+     * @param {WebAssemblyType} type 
+     * @returns {void}
+     * @example
+     * gen.declare("pi", "double");
+     * gen.set("pi", () => gen.const("3.14159"));
+     */
     declare(variable: string, type: WebAssemblyType): void {
         this.closure(
             ["local", `$${variable}`, w[type]]
