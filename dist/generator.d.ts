@@ -1,7 +1,8 @@
-import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyReferenceType, WebAssemblyType } from "./types";
+import { WebAssemblyFloatingType, WebAssemblyIntegerType, WebAssemblyReferenceType, WebAssemblyType, Parameters } from "./types";
 /**
+ * Main generator function
  * @author 99TheDark <99thedark@gmail.com>
- * @version 1.2.1
+ * @version 1.3.0
  */
 export declare class WebAssemblyGenerator {
     private location;
@@ -14,9 +15,9 @@ export declare class WebAssemblyGenerator {
     private append;
     private closure;
     /**
+     * Wrapper around all the code inside a WebAssembly module
      * @param {Function} body Module body
      * @returns {void}
-     * @description Wrapper around all the code inside a WebAssembly module
      * @example
      * gen.module(() => {
      *     gen.import("stdlib", "println", "log", ["int", "int"]);
@@ -30,12 +31,12 @@ export declare class WebAssemblyGenerator {
      */
     module(body: Function): void;
     /**
+     * Import functions from other libraries
      * @param {string} library Library the imported function is from
      * @param {string} funcName Name of the imported function
      * @param {string} name Signature of the imported function
      * @param {WebAssemblyType[]} params Parameter types of the imported function
      * @returns {void}
-     * @description Import functions from other libraries
      * @example
      * const gen = new WebAssemblyGenerator("script", { console: { log: console.log } });
      * gen.module(() => {
@@ -47,20 +48,20 @@ export declare class WebAssemblyGenerator {
      */
     import(library: string, funcName: string, name: string, params: WebAssemblyType[]): void;
     /**
+     * Store a string in memory
      * @param {string} str String to be stored
      * @returns {void}
-     * @description Store a string in memory
      * @example
      * gen.string("Hello, world!");
      */
     string(str: string): void;
     /**
+     * Generate a function
      * @param {string} name
-     * @param {Record<string, WebAssemblyType>} params Signatures and
+     * @param {Parameters} params Signatures and
      * @param {(WebAssemblyType | null)} result The return type, null being void
      * @param {Function} body Body of the function
      * @returns {void}
-     * @description Generate a function
      * @example
      * gen.func("add", { a: "int", b: "int" }, "int", () => {
      *     gen.return(() => gen.add("int",
@@ -69,12 +70,12 @@ export declare class WebAssemblyGenerator {
      *     ));
      * });
      */
-    func(name: string, params: Record<string, WebAssemblyType>, result: WebAssemblyType | null, body: Function): void;
+    func(name: string, params: Parameters, result: WebAssemblyType | null, locals: Parameters, body: Function): void;
     /**
+     * Calls a function
      * @param {string} name Name of function to be called
      * @param {Function[]} params Function parameters
      * @returns {void}
-     * @description Calls a function
      * @example
      * gen.call("multiplyThreeNumbers",
      *     () => gen.const("int", 5),
@@ -90,39 +91,39 @@ export declare class WebAssemblyGenerator {
      */
     call(name: string, ...params: Function[]): void;
     /**
+     * Creates a table of references
      * @param {string} name Signature of the table
      * @param {number} size Starting size of the table
      * @param {WebAssemblyReferenceType} elements Reference type
      * @returns {void}
-     * @description Creates a table of references
      * @example
      * gen.table("utils", 5, "funcref");
      */
     table(name: string, size: number, elements: WebAssemblyReferenceType): void;
     /**
+     * Adds elements to a table and initializes it
      * @param {Function} alignment Offset in memory
      * @param {string[]} references Signatures of references
      * @returns {void}
-     * @description Adds elements to a table and initializes it
      * @example
      * gen.table("myFunctions", 4, "funcref");
      * gen.elements(0, "func1", "someOtherFunc");
      */
     elements(alignment: Function, ...references: string[]): void;
     /**
+     * Selects a starting function to run, which must return nothing
      * @param {string} name Signature of the function
      * @returns {void}
-     * @description Selects a starting function to run, which must return nothing
      * @example
      * gen.start("main");
      */
     start(name: string): void;
     /**
+     * Adds two numbers
      * @param {WebAssemblyType} type Type of numbers being added
      * @param {Function} left Left-hand side of the operation
      * @param {Function} right Right-hand side of the operation
      * @returns {void}
-     * @description Add two numbers
      * @example
      * gen.add("long",
      *     gen.const("long", 1042),
@@ -134,11 +135,11 @@ export declare class WebAssemblyGenerator {
      */
     add(type: WebAssemblyType, left: Function, right: Function): void;
     /**
+     * Subtracts two numbers
      * @param {WebAssemblyType} type Type of numbers being subtracted
      * @param {Function} left Left-hand side of the operation
      * @param {Function} right Right-hand side of the operation
      * @returns {void}
-     * @description Subtract two numbers
      * @example
      * gen.subtract("double",
      *     gen.const("double", 23545.96),
@@ -147,11 +148,11 @@ export declare class WebAssemblyGenerator {
      */
     subtract(type: WebAssemblyType, left: Function, right: Function): void;
     /**
+     * Multiplies two numbers
      * @param {WebAssemblyType} type Type of numbers being multiplied
      * @param {Function} left Left-hand side of the operation
      * @param {Function} right Right-hand side of the operation
      * @returns {void}
-     * @description Multiply two numbers
      * @example
      * gen.multiply("float",
      *     gen.get("aFloatingPointNumber"),
@@ -160,11 +161,11 @@ export declare class WebAssemblyGenerator {
      */
     multiply(type: WebAssemblyType, left: Function, right: Function): void;
     /**
+     * Divides two numbers
      * @param {WebAssemblyType} type Type of numbers being divided
      * @param {Function} left Left-hand side of the operation
      * @param {Function} right Right-hand side of the operation
      * @returns {void}
-     * @description Divide two numbers
      * @example
      * gen.divide("float",
      *     gen.get("floatA"),
@@ -172,7 +173,19 @@ export declare class WebAssemblyGenerator {
      * );
      */
     divide(type: WebAssemblyType, left: Function, right: Function): void;
-    remainder(type: WebAssemblyType, left: Function, right: Function): void;
+    /**
+     * Modulates two numbers
+     * @param {WebAssemblyIntegerType} type Type of numbers being modulated
+     * @param {Function} left Left-hand side of the operation
+     * @param {Function} right Right-hand side of the operation
+     * @returns {void}
+     * @example
+     * gen.modulo("int",
+     *     () => gen.const("int", 5),
+     *     () => gen.const("int", 2)
+     * );
+     */
+    modulo(type: WebAssemblyIntegerType, left: Function, right: Function): void;
     lessThan(type: WebAssemblyType, left: Function, right: Function): void;
     greaterThan(type: WebAssemblyType, left: Function, right: Function): void;
     lessThanOrEqualTo(type: WebAssemblyType, left: Function, right: Function): void;
@@ -203,6 +216,10 @@ export declare class WebAssemblyGenerator {
     copySign(type: WebAssemblyFloatingType, a: Function, b: Function): void;
     convert(from: WebAssemblyType, to: WebAssemblyType, value: Function): void;
     reinterpret(fromType: WebAssemblyFloatingType, toType: WebAssemblyFloatingType, from: Function, to: Function): void;
+    /**
+     * @param type
+     * @param value
+     */
     const(type: WebAssemblyType, value: string | number): void;
     declare(variable: string, type: WebAssemblyType): void;
     declareGlobal(variable: string, type: WebAssemblyType, value: Function | void): void;
@@ -210,7 +227,7 @@ export declare class WebAssemblyGenerator {
     setGlobal(variable: string, value: Function): void;
     get(variable: string): void;
     getGlobal(variable: string): void;
-    allocate(body: Function, size: number | void, pages: number | void): void;
+    allocate(body: Function): void;
     store(type: WebAssemblyType, offset: number, alignment: Function, value: Function): void;
     load(type: WebAssemblyType, offset: number, alignment: Function): void;
     size(): void;
@@ -219,9 +236,48 @@ export declare class WebAssemblyGenerator {
     loop(name: string, condition: Function, body: Function): void;
     block(name: string, body: Function): void;
     break(block: string): void;
+    /**
+     * Returns the body from the function
+     * @param {Function} body
+     * @example
+     * gen.func("getMax", { a: "double", b: "double" }, "double", () => {
+     *     gen.if("double",
+     *         () => gen.lessThan("double",
+     *             () => gen.get("a"),
+     *             () => gen.get("b")
+     *         ),
+     *         () => gen.return(() => gen.get("b")),
+     *         () => gen.return(() => gen.get("a"))
+     *     )
+     * });
+     */
     return(body: Function): void;
     select(a: Function, b: Function, boolean: Function): void;
+    /**
+     * Returns currently generated code
+     * @returns {string}
+     * @example
+     * const gen = new WebAssemblyGenerator("output/script", {});
+     * // ...
+     *
+     * console.log(gen.stringify());
+     */
     stringify(): string;
+    /**
+     * Compiles the stringified code to a .wat file, then converts it to a .wasm file using wat2wasm
+     * @returns {Promise<void>}
+     * @example
+     * const gen = new WebAssemblyGenerator("output/script", {});
+     * // ...
+     *
+     * gen.compile();
+     */
     compile(): Promise<void>;
+    /**
+     * Runs the generated .wasm file
+     * @returns {void}
+     * @example
+     * gen.compile().then(() => gen.run());
+     */
     run(): void;
 }
